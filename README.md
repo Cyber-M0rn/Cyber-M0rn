@@ -1,93 +1,85 @@
-# Python3 program to calculate
-# solutions of linear equations
-# using cramer's rule
+#include<iostream>
+#include<math.h>       // used for pow() function. pow() function is used to calculate some power of a number
+using namespace std;
 
-# This functions finds the
-# determinant of Matrix
-def determinantOfMatrix(mat):
+int find_determinant(int matrix[3][3], int n)
+{
+    int a,b,c,d,i,j,k;
+    int temp_determinant=0,subcofactor_matrix[3][3],cofactor_i,cofactor_j;
+    
+    if(n==1)          // if order of a matrix is 1
+        return matrix[0][0];
+    
+    if(n==2)         // if order of a matrix is 2
+    {
+       a=matrix[0][0];
+       b=matrix[0][1];
+       c=matrix[1][0];
+       d=matrix[1][1];
+       
+       return (a*d - b*c);
+    }
+    
+    if(n==3)        // if order of a matrix is 3
+    {
+        // loop for 0th row elements. Because for finding determinant of a matrix we only need to find out cofactors of 0th row elements
+        for(k=0; k<n; k++) 
+        {
+            cofactor_i = 0;
 
-	ans = (mat[0][0] * (mat[1][1] * mat[2][2] -
-						mat[2][1] * mat[1][2]) -
-		mat[0][1] * (mat[1][0] * mat[2][2] -
-						mat[1][2] * mat[2][0]) +
-		mat[0][2] * (mat[1][0] * mat[2][1] -
-						mat[1][1] * mat[2][0]))
-	return ans
+                //Here, we have started loop from 1. Because we don't want to consider elements of same row for finding cofactor of an element
+            for (i=1; i<n; i++) 
+            {
+               cofactor_j = 0;
+               for (j=0; j<n; j++) 
+                {
+                    if (j!=k)  // we have used this codition. because we don't want to consider elements of same column for finding cofactor of an element
+                    {
+                        //forming sub_cofactor matrix
+                        subcofactor_matrix[cofactor_i][cofactor_j] = matrix[i][j];
+                        cofactor_j++;                        
+                    }
 
-# This function finds the solution of system of
-# linear equations using cramer's rule
-def findSolution(coeff):
+                }
+                cofactor_i++;
+            }
+            
+            // calculating determinant of a matrix
+            temp_determinant = temp_determinant + (pow(-1, k) * matrix[0][k] * find_determinant( subcofactor_matrix, n - 1 ));
+        }
+    }
+    return temp_determinant;
+}
 
-	# Matrix d using coeff as given in
-	# cramer's rule
-	d = [[coeff[0][0], coeff[0][1], coeff[0][2]],
-		[coeff[1][0], coeff[1][1], coeff[1][2]],
-		[coeff[2][0], coeff[2][1], coeff[2][2]]]
-	
-	# Matrix d1 using coeff as given in
-	# cramer's rule
-	d1 = [[coeff[0][3], coeff[0][1], coeff[0][2]],
-		[coeff[1][3], coeff[1][1], coeff[1][2]],
-		[coeff[2][3], coeff[2][1], coeff[2][2]]]
-	
-	# Matrix d2 using coeff as given in
-	# cramer's rule
-	d2 = [[coeff[0][0], coeff[0][3], coeff[0][2]],
-		[coeff[1][0], coeff[1][3], coeff[1][2]],
-		[coeff[2][0], coeff[2][3], coeff[2][2]]]
-	
-	# Matrix d3 using coeff as given in
-	# cramer's rule
-	d3 = [[coeff[0][0], coeff[0][1], coeff[0][3]],
-		[coeff[1][0], coeff[1][1], coeff[1][3]],
-		[coeff[2][0], coeff[2][1], coeff[2][3]]]
 
-	# Calculating Determinant of Matrices
-	# d, d1, d2, d3
-	D = determinantOfMatrix(d)
-	D1 = determinantOfMatrix(d1)
-	D2 = determinantOfMatrix(d2)
-	D3 = determinantOfMatrix(d3)
-	
-	print("D is : ", D)
-	print("D1 is : ", D1)
-	print("D2 is : ", D2)
-	print("D3 is : ", D3)
-
-	# Case 1
-	if (D != 0):
-	
-		# Coeff have a unique solution.
-		# Apply Cramer's Rule
-		x = D1 / D
-		y = D2 / D
-		
-		# calculating z using cramer's rule
-		z = D3 / D
-		
-		print("Value of x is : ", x)
-		print("Value of y is : ", y)
-		print("Value of z is : ", z)
-
-	# Case 2
-	else:
-		if (D1 == 0 and D2 == 0 and
-			D3 == 0):
-			print("Infinite solutions")
-		elif (D1 != 0 or D2 != 0 or
-			D3 != 0):
-			print("No solutions")
-
-# Driver Code
-if __name__ == "__main__":
-
-	# storing coefficients of linear
-	# equations in coeff matrix
-	coeff = [[1 , 1 , 1 , 7],
-			[1 , -1 , 2 , 9 ],
-			[2, 1 , -1 , 1]]
-
-	findSolution(coeff)
-
-# This code is contributed by Chitranayal
-
+int main()
+{
+    int i,j,n,determinant,matrix[3][3];
+    
+    cout<<"Enter order of a matrix (1/2/3): ";
+    cin>>n;
+    while( n<1 || n>3 )            // if mentioned order is not in between 1 and 3
+    {
+        cout<<"\nPlease..Enter order of a matrix in 1 to 3: ";
+        cin>>n;
+    }
+    
+    cout<<"\nEnter the elements of a matrix: ";       // Taking elements of matrix as a input
+    for(i=0; i<n; i++)
+        for(j=0; j<n; j++)
+            cin>>matrix[i][j];
+    
+    cout<<"\nEntered matrix:\n";        // Displaying entered matrix
+    for(i=0; i<n; i++)
+    {
+        for(j=0; j<n; j++)
+        {
+            cout<<matrix[i][j]<<" ";
+        }
+        cout<<"\n";
+    }
+            
+    determinant=find_determinant(matrix,n);     // function call to find_determinant
+    cout<<"\nDeterminant of the Entered matrix is: "<<determinant;
+    return 0;
+}
